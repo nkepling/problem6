@@ -14,19 +14,40 @@ DOWN = 1
 RIGHT = 2
 UP = 3
 
-MAPS = {
-    "4x4": ["SFFF", "FHFH", "FFFH", "HFFG"],
-    "8x8": [
-        "SFFFFFFF",
-        "FFFFFFFF",
-        "FFFHFFFF",
-        "FFFFFHFF",
-        "FFFHFFFF",
-        "FHHFFFHF",
-        "FHFFHFHF",
-        "FFFHFFFG",
-    ],
-}
+MAPS= {"4x4":[
+        "SFFF",
+        "FHFH",
+        "FFFH",
+        "HFFG"
+        ],
+        "8x8": [
+            "SFFFFFFF",
+            "FFFFFFFF",
+            "FFFHFFFF",
+            "FFFFFHFF",
+            "FFFHFFFF",
+            "FHHFFFHF",
+            "FHFFHFHF",
+            "FFFHFFFG",
+        ],
+        "14x14":[
+            "HHHHHHHHHHHHHH",
+            "HSFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFGFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFGFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFGH",
+            "HHHHHHHHHHHHHH",
+
+
+        ]}
 
 
 # DFS to check that it's a valid path.

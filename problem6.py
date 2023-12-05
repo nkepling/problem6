@@ -32,6 +32,24 @@ maps = {"4x4":[
             "FHHFFFHF",
             "FHFFHFHF",
             "FFFHFFFG",
+        ],
+        "14x14":[
+            "HHHHHHHHHHHHHH",
+            "HSFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFFH",
+            "HFFFFFFFFFFFGH",
+            "HHHHHHHHHHHHHH",
+
+
         ]}
 
 def simple_render(map_name,s):
@@ -52,7 +70,7 @@ print(simple_render(map_name,state[0]))
 # c = 1/math.sqrt(2)
 c = 1.44
 for _ in range(1000):
-    mcts = MCTS(env,state=state,d=50,m=1000,c=c,gamma=0.9)
+    mcts = MCTS(env,state=state,d=200,m=1000,c=c,gamma=0.9)
     action = mcts.search()
     state = env.step(action)
     print(state)

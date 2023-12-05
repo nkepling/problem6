@@ -54,6 +54,31 @@ class ChanceNode(Node):
         super().__init__()
     # TODO: Figure out how to implement this... 
 
+def best_child(node:Node,c):
+    """
+    Select the best child node with UCB1
+
+    Output: the index of the best child in node.children 
+    array of action values
+    """
+    children = node.children
+    values = [child.Q/child.N + c*np.sqrt(2*np.log(node.N/child.N)) for child in children]
+    best_child_ind = np.argmax(values)
+    return best_child_ind,values
+
+
+def pareto_best_child(node:Node,D):
+    """
+    Select the best child with Pareto UCB
+    """
+
+    children = node.children
+
+    values  = [child.Q/child.N + np.sqrt((4*np.log(node.N)+np.log(D)))for child in children]
+    best_child_ind = np.argmax(values)
+    return best_child_ind,values
+
+
 
 class MCTS:
 
@@ -114,19 +139,16 @@ class MCTS:
             vl = self._tree_policy(self.v0) #vl is the last node visitied by the tree search
             R = self._default_policy(vl)
             self._backpropagation(R,vl)
-            # if k == self.m//2:
-            #     print(vl.Q)
 
-        # for k,child in self.v0.children.items():
-        #     print(f"Q:{child.Q}")
-        #     print(f"N : {child.N}")
+        # action_values = [(child.Q/child.N) for child in self.v0.children]
 
-        action_values = [(child.Q/child.N) for child in self.v0.children]
-
-        # action_values = {k:(child.Q/child.N) for k,child in self.v0.children.items()} #BUG? could be unpackign weird
+        best_child_ind,action_values = best_child(self.v0,0)
+        # best_child_ind,action_values = pareto_best_child(self.v0,len(self.v0.state['obs']['targets']))
         # print(action_values)
-        # best_action = max(action_values,key=action_values.get)
-        best_action = self.v0.children[np.argmax(action_values)].action
+        best_action = self.v0.children[best_child_ind].action
+
+        self.v0 = self.v0.children[best_child_ind]
+
         return best_action
 
 
@@ -159,28 +181,23 @@ class MCTS:
         while not terminated and depth < self.d:
             action = self.sim_env.action_space.sample() #randomly sample from environments action space
             observation,reward,terminated,truncated,info = self.sim_env.step(action)
-            tot_reward += reward
+            tot_reward += reward*self.gamma**depth
+            # tot_reward += reward
             depth+=1
         #print(f"T reward:{tot_reward}")
 
-        tot_reward = tot_reward*self.gamma**depth #
+        # tot_reward = tot_reward*self.gamma**depth #
         return tot_reward
 
     def _selection(self,v:Node):
         """
         Pick the next node to go down in the search tree based on UTC
         """
-        # child_nodes = list(v.children.values()) #dictionary k = action, v = node
-        child_nodes = v.children
-
-        # best_child_ind = np.argmax([child.Q/child.N + self.c * np.sqrt(2*np.log(v.N)/(child.N)) for child in child_nodes])        
-        best_child_ind = np.argmax([child.Q/child.N + self.c * np.sqrt(2*np.log(v.N)/(child.N)) for child in child_nodes])        
-        best_child = child_nodes[best_child_ind]
-        # best_child = child_nodes[best_child_ind] 
-        # best_chile = np.argmax(bes)
-        best_action = best_child.action
+        best_child_ind,_ = best_child(v,self.c)      
+        # best_child_ind,action_values = pareto_best_child(v,len(v.state['obs']['targets']))
+        best_action = v.children[best_child_ind].action 
         self.sim_env.step(best_action)
-        return best_child
+        return v.children[best_child_ind]
     
     def _expand(self,v:Node):
         """
@@ -219,7 +236,30 @@ class MCTS:
 
 
 if __name__ == "__main__":
-  pass
+    import gymnasium as gym
+    from gymnasium.envs.registration import register
+    from envs.grid_world import GridWorldEnv
+    import numpy as np
+    import networkx as nx
+
+
+
+    env = gym.make('MyGridWorld',render_mode="human")
+    init_state = env.reset()
+    observation, info = init_state
+    src = observation['agent'] #staring location
+    tgt = observation['target'] #ending location
+
+    print(f"Agent start: {src}")
+    print(f"Targt loc: {src}")
+
+    c = 1/np.sqrt(2)
+
+    done = False
+    while not done:
+        mcts = MCTS(env,init_state,10,100,c)
+        action = mcts.search()
+        env.step(action=action)
 
 
 
